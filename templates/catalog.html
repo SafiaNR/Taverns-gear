@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Каталог - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="catalog-page">
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="catalog-layout">
+            <div class="left-column">
+                <div class="filters">
+                    <div class="filter-section">
+                        <h3>Категории</h3>
+                        <ul class="category-list">
+                            <li><a href="{% url 'catalog' %}" class="{% if not selected_category %}active{% endif %}">Все товары</a></li>
+                            <li><a href="?category=starter-set" class="{% if selected_category == 'starter-set' %}active{% endif %}">Стартовый набор</a></li>
+                            <li><a href="?category=books" class="{% if selected_category == 'books' %}active{% endif %}">Книги</a></li>
+                            <li><a href="?category=dice" class="{% if selected_category == 'dice' %}active{% endif %}">Кубики</a></li>
+                            <li><a href="?category=miniatures" class="{% if selected_category == 'miniatures' %}active{% endif %}">Миниатюры</a></li>
+                            <li><a href="?category=playmats" class="{% if selected_category == 'playmats' %}active{% endif %}">Игровые поля</a></li>
+                            <li><a href="?category=accessories" class="{% if selected_category == 'accessories' %}active{% endif %}">Аксессуары</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sort-section">
+                    <h3>Сортировать по:</h3>
+                    <div class="sort-links">
+                        <a href="?sort=-created_at" class="sort-link">Новизне</a>
+                        <a href="?sort=name" class="sort-link">Названию</a>
+                        <a href="?sort=price" class="sort-link">Цене (возр.)</a>
+                        <a href="?sort=-price" class="sort-link">Цене (убыв.)</a>
+                        <a href="?sort=year" class="sort-link">Году выпуска</a>
+                    </div>
+                </div>
+            </div>
+            <div class="catalog-content">
+                <div class="products-grid">
+                    {% for product in products %}
+                    <div class="product-card">
+                        <a href="#" class="product-link">
+                            <div class="product-image">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="no-image">Нет изображения</div>
+                                {% endif %}
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">{{ product.name }}</h3>
+                                <div class="product-price">{{ product.price }} ₽</div>
+                                {% if product.stock > 0 %}
+                                    <div class="product-stock in-stock">В наличии: {{ product.stock }} шт.</div>
+                                {% else %}
+                                    <div class="product-stock out-of-stock">Нет в наличии</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="no-products">Товары не найдены</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
