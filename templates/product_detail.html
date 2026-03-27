@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="product-detail-page">
+    <div class="container">
+        <div class="path">
+            <a href="{% url 'catalog' %}">Каталог</a> / 
+            <a href="{% url 'catalog' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> / 
+            <span>{{ product.name }}</span>
+        </div>
+
+        <div class="product-detail">
+            <div class="product-detail-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <div class="no-image">Нет изображения</div>
+                {% endif %}
+            </div>
+            
+            <div class="product-detail-info">
+                <h1 class="product-detail-title">{{ product.name }}</h1>
+                
+                <div class="product-detail-price">{{ product.price }} ₽</div>
+                
+                <div class="product-detail-stock">
+                    {% if product.stock > 0 %}
+                        <span class="in-stock">✓ В наличии: {{ product.stock }} шт.</span>
+                    {% else %}
+                        <span class="out-of-stock">✗ Нет в наличии</span>
+                    {% endif %}
+                </div>
+                
+                <div class="product-detail-description">
+                    <h3>Описание</h3>
+                    <p>{{ product.description|default:"Описание отсутствует" }}</p>
+                </div>
+                
+                <div class="product-detail-specs">
+                    <h3>Характеристики</h3>
+                    <table class="specs-table">
+                        {% if product.country %}
+                        <tr>
+                            <th>Страна-производитель:</th>
+                            <td>{{ product.country }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if product.year %}
+                        <tr>
+                            <th>Год выпуска:</th>
+                            <td>{{ product.year }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if product.model %}
+                        <tr>
+                            <th>Модель:</th>
+                            <td>{{ product.model }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if product.category %}
+                        <tr>
+                            <th>Категория:</th>
+                            <td>{{ product.category.name }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                
+                {% if product.stock > 0 %}
+                <div class="product-detail-actions">
+                    <form action="#" method="post" class="add-to-cart-form">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-input">
+                        <button type="submit" class="btn-add-to-cart">В корзину</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if similar_products %}
+        <div class="similar-products">
+            <h2>Похожие товары</h2>
+            <div class="products-grid">
+                {% for similar in similar_products %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' similar.slug %}" class="product-link">
+                        <div class="product-image">
+                            {% if similar.image %}
+                                <img src="{{ similar.image.url }}" alt="{{ similar.name }}">
+                            {% else %}
+                                <div class="no-image">Нет изображения</div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">{{ similar.name }}</h3>
+                            <div class="product-price">{{ similar.price }} ₽</div>
+                            <div class="product-stock in-stock">В наличии: {{ similar.stock }}</div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

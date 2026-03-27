@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}О нас - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="about-page">
+    <div class="container">
+        <div class="about-header">
+            <h1 class="shop-name">Tavern's Gear</h1>
+            <p class="slogan">"Экипируй своего героя для великих приключений!"</p>
+        </div>
+
+        
+        <div class="novelties-section">
+            <h2>Новинки</h2>
+            
+            {% if new_products %}
+            <div class="slider-box" id="sliderBox">
+                <div class="slider-window">
+                    <div class="slider-strip" id="sliderStrip">
+                        {% for product in new_products %}
+                        <div class="slider-card">
+                            <a href="{% url 'product_detail' product.slug %}">
+                                <div class="slider-card-img">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <div style="padding: 40px;">📷</div>
+                                    {% endif %}
+                                </div>
+                                <div class="slider-card-title">{{ product.name }}</div>
+                                <div class="slider-card-price">{{ product.price }} ₽</div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="slider-btn-left" id="prevButton">◀</button>
+                <button class="slider-btn-right" id="nextButton">▶</button>
+            </div>
+            
+            <div class="slider-dots-box" id="sliderDotsBox"></div>
+            {% else %}
+            <p style="text-align: center; color: var(--text-gray);">Новинок пока нет</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+        
+        <div class="about-content">
+            <div class="info-block">
+                <h2>О нашем магазине</h2>
+                <p>Добро пожаловать в <strong>Tavern's Gear</strong> — ваш надежный поставщик качественных комплектующих для настольной игры Dungeons & Dragons!</p>
+                <p>Мы знаем, как важно иметь правильное снаряжение для незабываемых приключений.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🎲</div>
+                    <h3>Широкий ассортимент</h3>
+                    <p>От кубиков до книг правил</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚔️</div>
+                    <h3>Высокое качество</h3>
+                    <p>Только проверенные производители</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <h3>Доступные цены</h3>
+                    <p>Лучшее соотношение цены и качества</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚚</div>
+                    <h3>Быстрая доставка</h3>
+                    <p>По всей стране</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const strip = document.getElementById('sliderStrip');
+        const prevBtn = document.getElementById('prevButton');
+        const nextBtn = document.getElementById('nextButton');
+        const dotsBox = document.getElementById('sliderDotsBox');
+        
+        if (!strip || !prevBtn || !nextBtn) {
+            console.log('Элементы слайдера не найдены');
+            return;
+        }
+        
+        const cards = document.querySelectorAll('.slider-card');
+        const totalCards = cards.length;
+        
+        if (totalCards === 0) {
+            console.log('Нет карточек для слайдера');
+            return;
+        }
+        
+        let currentIndex = 0;
+        
+        function updateSlider() {
+            const cardWidth = cards[0].offsetWidth;
+            strip.style.transform = 'translateX(-' + (currentIndex * cardWidth) + 'px)';
+            
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((dot, i) => {
+                if (i === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        function slidePrev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = totalCards - 1;
+            }
+            updateSlider();
+        }
+        
+        function slideNext() {
+            if (currentIndex < totalCards - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlider();
+        }
+        
+        prevBtn.onclick = slidePrev;
+        nextBtn.onclick = slideNext;
+        
+        if (dotsBox) {
+            for (let i = 0; i < totalCards; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'slider-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.onclick = (function(index) {
+                    return function() {
+                        currentIndex = index;
+                        updateSlider();
+                    };
+                })(i);
+                dotsBox.appendChild(dot);
+            }
+        }
+        
+        window.addEventListener('resize', function() {
+            updateSlider();
+        });
+        
+        let autoInterval = setInterval(slideNext, 5000);
+        
+        const sliderBox = document.getElementById('sliderBox');
+        if (sliderBox) {
+            sliderBox.addEventListener('mouseenter', function() {
+                clearInterval(autoInterval);
+            });
+            sliderBox.addEventListener('mouseleave', function() {
+                autoInterval = setInterval(slideNext, 5000);
+            });
+        }
+        
+        setTimeout(updateSlider, 100);
+        
+        console.log('Слайдер инициализирован! Слайдов: ' + totalCards);
+    });
+</script>
+
+{% endblock %}

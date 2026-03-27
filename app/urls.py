@@ -22,10 +22,11 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', lambda request: redirect('catalog')), 
+    path('', include('main.urls')), 
     path('catalog/', include('catalog.urls')),
     path('', include('users.urls')),
-    # path('', include('main.urls')),  
+    path('cart/', include('cart.urls')),
+    path('orders/', include('orders.urls')),
 ]
 
 if settings.DEBUG:

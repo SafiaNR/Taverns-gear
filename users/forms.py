@@ -10,6 +10,7 @@ class CyrillicValidator:
             raise ValidationError('Разрешены только кириллица, пробел и дефис')
 
 class CustomUserCreationForm(UserCreationForm):
+    
     first_name = forms.CharField(
         label='Имя',
         max_length=150,
@@ -46,7 +47,7 @@ class CustomUserCreationForm(UserCreationForm):
     password1 = forms.CharField(
         label='Пароль',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '******'}),
-        help_text='Не менее 6 символов'
+        help_text='Пароль должен содержать не менее 6 символов'
     )
     password2 = forms.CharField(
         label='Подтверждение пароля',
@@ -66,6 +67,8 @@ class CustomUserCreationForm(UserCreationForm):
         username = self.cleaned_data.get('username')
         if not re.match(r'^[a-zA-Z0-9\-]+$', username):
             raise ValidationError('Разрешены только латиница, цифры и дефис')
+        if User.objects.filter(username=username).exists():
+            raise ValidationError('Пользователь с таким логином уже существует')
         return username
 
     def clean_email(self):
@@ -74,7 +77,15 @@ class CustomUserCreationForm(UserCreationForm):
             raise ValidationError('Пользователь с таким email уже существует')
         return email
 
+    def clean_password1(self):
+        password = self.cleaned_data.get('password1')
+        if password:
+            if len(password) < 6:
+                raise ValidationError('Пароль должен содержать не менее 6 символов')
+        return password
+
 class CustomAuthenticationForm(AuthenticationForm):
+    
     username = forms.CharField(
         label='Логин',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Логин'})
@@ -83,3 +94,12 @@ class CustomAuthenticationForm(AuthenticationForm):
         label='Пароль',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'})
     )
+    
+    error_messages = {
+        'invalid_login': 'Неверный логин или пароль',
+        'inactive': 'Учетная запись неактивна',
+    }
+    
+    def __init__(self, request=None, *args, **kwargs):
+        super().__init__(request, *args, **kwargs)
+        self.error_messages['invalid_login'] = 'Неверный логин или пароль'

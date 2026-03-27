@@ -14,8 +14,11 @@
             <div class="container">
                 <a href="{% url 'catalog' %}" class="logo">Tavern's Gear</a>
                 <ul class="nav-menu">
+                    <li><a href="{% url 'about' %}">О нас</a></li>
                     <li><a href="{% url 'catalog' %}">Каталог</a></li>
                     {% if user.is_authenticated %}
+                        <li><a href="{% url 'cart_detail' %}">Корзина</a></span></li>
+                        <li><a href="{% url 'order_list' %}">Мои заказы</a></li>
                         <li><a href="#">{{ user.username }}</a></li>
                         <li><a href="{% url 'logout' %}">Выйти</a></li>
                     {% else %}

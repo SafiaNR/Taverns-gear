@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оформление заказа - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="order-create-page">
+    <div class="container">
+        <h1>Оформление заказа</h1>
+        
+        <div class="order-summary">
+            <h2>Ваш заказ</h2>
+            {% for item in cart %}
+            <div class="order-item">
+                {{ item.product.name }} x {{ item.quantity }} = {{ item.total_price }} ₽
+            </div>
+            {% endfor %}
+            <div class="order-total">Итого: {{ cart.get_total_price }} ₽</div>
+        </div>
+        
+        <form id="orderForm" class="order-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="password">Введите пароль для подтверждения заказа</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-submit">Сформировать заказ</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('orderForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        const password = document.getElementById('password').value;
+        
+        fetch('/orders/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.error);
+            }
+        });
+    };
+</script>
+{% endblock %}

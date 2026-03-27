@@ -8,7 +8,9 @@
     <div class="container">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
         
@@ -28,22 +30,24 @@
                         </ul>
                     </div>
                 </div>
+
                 <div class="sort-section">
-                    <h3>Сортировать по:</h3>
+                    <h3>Сортировать по</h3>
                     <div class="sort-links">
-                        <a href="?sort=-created_at" class="sort-link">Новизне</a>
-                        <a href="?sort=name" class="sort-link">Названию</a>
-                        <a href="?sort=price" class="sort-link">Цене (возр.)</a>
-                        <a href="?sort=-price" class="sort-link">Цене (убыв.)</a>
-                        <a href="?sort=year" class="sort-link">Году выпуска</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-created_at" class="sort-link">Новизне</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=name" class="sort-link">Названию</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=price" class="sort-link">Цене (возр.)</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-price" class="sort-link">Цене (убыв.)</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=year" class="sort-link">Году выпуска</a>
                     </div>
                 </div>
             </div>
+
             <div class="catalog-content">
                 <div class="products-grid">
                     {% for product in products %}
                     <div class="product-card">
-                        <a href="#" class="product-link">
+                        <a href="{% url 'product_detail' product.slug %}" class="product-link">
                             <div class="product-image">
                                 {% if product.image %}
                                     <img src="{{ product.image.url }}" alt="{{ product.name }}">
@@ -55,12 +59,15 @@
                                 <h3 class="product-title">{{ product.name }}</h3>
                                 <div class="product-price">{{ product.price }} ₽</div>
                                 {% if product.stock > 0 %}
-                                    <div class="product-stock in-stock">В наличии: {{ product.stock }} шт.</div>
+                                    <div class="product-stock in-stock">В наличии: {{ product.stock }}</div>
                                 {% else %}
                                     <div class="product-stock out-of-stock">Нет в наличии</div>
                                 {% endif %}
                             </div>
                         </a>
+                        {% if user.is_authenticated and product.stock > 0 %}
+                        <button class="btn-add-to-cart" data-id="{{ product.id }}" data-name="{{ product.name }}">В корзину</button>
+                        {% endif %}
                     </div>
                     {% empty %}
                     <p class="no-products">Товары не найдены</p>
@@ -70,4 +77,54 @@
         </div>
     </div>
 </div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+    
+    document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `product_id=${productId}&quantity=1`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert(data.error || 'Ошибка при добавлении');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка');
+            });
+        };
+    });
+</script>
 {% endblock %}
