@@ -8,100 +8,84 @@
     <div class="container">
         <div class="about-header">
             <h1 class="shop-name">Tavern's Gear</h1>
-            <p class="slogan">"Экипируй своего героя для великих приключений!"</p>
+            <p class="slogan">"Экипируй своего героя для приключений!"</p>
         </div>
-
-        
+        {% if new_products %}
         <div class="novelties-section">
             <h2>Новинки</h2>
             
-            {% if new_products %}
-            <div class="slider-box" id="sliderBox">
-                <div class="slider-window">
-                    <div class="slider-strip" id="sliderStrip">
-                        {% for product in new_products %}
-                        <div class="slider-card">
-                            <a href="{% url 'product_detail' product.slug %}">
-                                <div class="slider-card-img">
-                                    {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                                    {% else %}
-                                        <div style="padding: 40px;">📷</div>
-                                    {% endif %}
-                                </div>
-                                <div class="slider-card-title">{{ product.name }}</div>
-                                <div class="slider-card-price">{{ product.price }} ₽</div>
-                            </a>
-                        </div>
-                        {% endfor %}
+            {% if new_products|length == 1 %}
+                <div class="single-product">
+                    {% for product in new_products %}
+                    <div class="product-card-single">
+                        <a href="{% url 'product_detail' product.slug %}">
+                            <div class="product-image-single">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="no-image">Нет фото</div>
+                                {% endif %}
+                            </div>
+                            <h3 class="product-title-single">{{ product.name }}</h3>
+                            <div class="product-price-single">{{ product.price }} ₽</div>
+                        </a>
                     </div>
+                    {% endfor %}
                 </div>
-                <button class="slider-btn-left" id="prevButton">◀</button>
-                <button class="slider-btn-right" id="nextButton">▶</button>
-            </div>
-            
-            <div class="slider-dots-box" id="sliderDotsBox"></div>
             {% else %}
-            <p style="text-align: center; color: var(--text-gray);">Новинок пока нет</p>
+                <div class="slider-box" id="sliderBox">
+                    <div class="slider-window">
+                        <div class="slider-strip" id="sliderStrip">
+                            {% for product in new_products %}
+                            <div class="slider-card">
+                                <a href="{% url 'product_detail' product.slug %}">
+                                    <div class="slider-card-img">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                        {% else %}
+                                            <div class="no-img">📷</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="slider-card-title">{{ product.name }}</div>
+                                    <div class="slider-card-price">{{ product.price }} ₽</div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button class="slider-btn-left" id="prevButton">◀</button>
+                    <button class="slider-btn-right" id="nextButton">▶</button>
+                </div>
+                
+                <div class="slider-dots-box" id="sliderDotsBox"></div>
             {% endif %}
         </div>
-    </div>
-</div>
+        {% endif %}
         
-        <div class="about-content">
+        <div class="about-info">
             <div class="info-block">
                 <h2>О нашем магазине</h2>
                 <p>Добро пожаловать в <strong>Tavern's Gear</strong> — ваш надежный поставщик качественных комплектующих для настольной игры Dungeons & Dragons!</p>
-                <p>Мы знаем, как важно иметь правильное снаряжение для незабываемых приключений.</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">🎲</div>
-                    <h3>Широкий ассортимент</h3>
-                    <p>От кубиков до книг правил</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">⚔️</div>
-                    <h3>Высокое качество</h3>
-                    <p>Только проверенные производители</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💰</div>
-                    <h3>Доступные цены</h3>
-                    <p>Лучшее соотношение цены и качества</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🚚</div>
-                    <h3>Быстрая доставка</h3>
-                    <p>По всей стране</p>
-                </div>
+                <p>Мы знаем, как важно иметь правильное снаряжение для незабываемых приключений. Наша команда тщательно отбирает товары, чтобы предложить вам только лучшее.</p>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+{% if new_products and new_products|length > 1 %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const strip = document.getElementById('sliderStrip');
         const prevBtn = document.getElementById('prevButton');
         const nextBtn = document.getElementById('nextButton');
         const dotsBox = document.getElementById('sliderDotsBox');
         
-        if (!strip || !prevBtn || !nextBtn) {
-            console.log('Элементы слайдера не найдены');
-            return;
-        }
+        if (!strip || !prevBtn || !nextBtn) return;
         
         const cards = document.querySelectorAll('.slider-card');
         const totalCards = cards.length;
         
-        if (totalCards === 0) {
-            console.log('Нет карточек для слайдера');
-            return;
-        }
+        if (totalCards === 0) return;
         
         let currentIndex = 0;
         
@@ -140,6 +124,7 @@
         prevBtn.onclick = slidePrev;
         nextBtn.onclick = slideNext;
         
+        // Создаем точки
         if (dotsBox) {
             for (let i = 0; i < totalCards; i++) {
                 const dot = document.createElement('span');
@@ -159,6 +144,7 @@
             updateSlider();
         });
         
+        // Автопрокрутка
         let autoInterval = setInterval(slideNext, 5000);
         
         const sliderBox = document.getElementById('sliderBox');
@@ -172,9 +158,7 @@
         }
         
         setTimeout(updateSlider, 100);
-        
-        console.log('Слайдер инициализирован! Слайдов: ' + totalCards);
-    });
+    })();
 </script>
-
+{% endif %}
 {% endblock %}

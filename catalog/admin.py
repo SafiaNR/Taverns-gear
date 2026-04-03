@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import Category, Product
 
-
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'product_count']
@@ -9,9 +8,8 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     
     def product_count(self, obj):
-        return obj.products.count()
-    product_count.short_description = 'Кол-во товаров'
-
+        return obj.products.filter(stock__gt=0).count()
+    product_count.short_description = 'Товаров в наличии'
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -21,20 +19,3 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['price', 'stock']
     list_per_page = 25
-    
-    fieldsets = (
-        ('Основная информация', {
-            'fields': ('category', 'name', 'slug', 'description')
-        }),
-        ('Цены и наличие', {
-            'fields': ('price', 'stock')
-        }),
-        ('Характеристики', {
-            'fields': ('country', 'year', 'model'),
-            'classes': ('collapse',)
-        }),
-        ('Изображение', {
-            'fields': ('image',),
-            'classes': ('collapse',)
-        }),
-    )

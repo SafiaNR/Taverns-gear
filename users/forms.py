@@ -102,4 +102,5 @@ class CustomAuthenticationForm(AuthenticationForm):
     
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request, *args, **kwargs)
-        self.error_messages['invalid_login'] = 'Неверный логин или пароль'
+        self.fields['username'].error_messages = {}
+        self.fields['password'].error_messages = {}

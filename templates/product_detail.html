@@ -6,7 +6,8 @@
 {% block content %}
 <div class="product-detail-page">
     <div class="container">
-        <div class="path">
+        <!-- Хлебные крошки -->
+        <div class="breadcrumbs">
             <a href="{% url 'catalog' %}">Каталог</a> / 
             <a href="{% url 'catalog' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> / 
             <span>{{ product.name }}</span>
@@ -60,22 +61,24 @@
                             <td>{{ product.model }}</td>
                         </tr>
                         {% endif %}
-                        {% if product.category %}
                         <tr>
                             <th>Категория:</th>
                             <td>{{ product.category.name }}</td>
                         </tr>
-                        {% endif %}
                     </table>
                 </div>
                 
-                {% if product.stock > 0 %}
+                  {% if user.is_authenticated and product.stock > 0 %}
                 <div class="product-detail-actions">
-                    <form action="#" method="post" class="add-to-cart-form">
-                        {% csrf_token %}
-                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-input">
-                        <button type="submit" class="btn-add-to-cart">В корзину</button>
-                    </form>
+                    <div class="quantity-selector">
+                        <label for="quantity">Количество:</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-input">
+                    </div>
+                    <button class="btn-add-to-cart-detail" data-id="{{ product.id }}" data-name="{{ product.name }}">В корзину</button>
+                </div>
+                {% elif not user.is_authenticated %}
+                <div class="login-message">
+                    <p>Для покупки товара <a href="{% url 'login' %}">войдите</a> в систему</p>
                 </div>
                 {% endif %}
             </div>
@@ -101,6 +104,7 @@
                             <div class="product-stock in-stock">В наличии: {{ similar.stock }}</div>
                         </div>
                     </a>
+                    <button class="btn-add-to-cart" data-id="{{ similar.id }}" data-name="{{ similar.name }}">В корзину</button>
                 </div>
                 {% endfor %}
             </div>
@@ -108,4 +112,84 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+    
+    const detailBtn = document.querySelector('.btn-add-to-cart-detail');
+    if (detailBtn) {
+        detailBtn.onclick = function() {
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            const quantity = document.getElementById('quantity').value;
+            
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `product_id=${productId}&quantity=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert(data.error || 'Ошибка при добавлении');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка');
+            });
+        };
+    }
+    
+    document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `product_id=${productId}&quantity=1`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert(data.error || 'Ошибка при добавлении');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка');
+            });
+        };
+    });
+</script>
 {% endblock %}

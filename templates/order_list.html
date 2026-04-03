@@ -38,7 +38,10 @@
             {% endfor %}
         </div>
         {% else %}
-        <p>У вас пока нет заказов</p>
+        <div class="empty-orders">
+            <p>У вас пока нет заказов</p>
+            <a href="{% url 'catalog' %}" class="btn-shop">Перейти в каталог</a>
+        </div>
         {% endif %}
     </div>
 </div>

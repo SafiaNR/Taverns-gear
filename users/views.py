@@ -31,11 +31,13 @@ def login_view(request):
                 messages.success(request, f'Добро пожаловать, {user.username}!')
                 return redirect('catalog')
         else:
+            storage = messages.get_messages(request)
+            storage.used = True
             messages.error(request, 'Неверный логин или пароль')
     else:
         form = CustomAuthenticationForm()
     
-    return render(request, 'login.html', {'form': form})  
+    return render(request, 'login.html', {'form': form})
 
 def logout_view(request):
     logout(request)

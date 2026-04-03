@@ -22,7 +22,6 @@ def cart_add(request):
         product = get_object_or_404(Product, id=product_id)
         cart = Cart(request)
         
-        # Проверка наличия
         current_quantity = cart.cart.get(str(product_id), {}).get('quantity', 0)
         if current_quantity + quantity > product.stock:
             return JsonResponse({
@@ -41,7 +40,7 @@ def cart_add(request):
         return JsonResponse({
             'success': False,
             'error': str(e)
-        }, status=500)
+        })
 
 @require_POST
 @login_required

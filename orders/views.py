@@ -14,19 +14,12 @@ def order_list(request):
     return render(request, 'order_list.html', {'orders': orders})
 
 @login_required
-def order_detail(request, order_id):
-    """Детали заказа"""
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'order_detail.html', {'order': order})
-
-@login_required
 def order_create(request):
     """Создание заказа"""
     cart = Cart(request)
     
     if len(cart) == 0:
-        messages.error(request, 'Корзина пуста')
-        return redirect('cart_detail')
+        return JsonResponse({'success': False, 'error': 'Корзина пуста'})
     
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -56,9 +49,10 @@ def order_create(request):
                     })
             
             cart.clear()
+            # Перенаправляем в список заказов
             return JsonResponse({
                 'success': True,
-                'redirect_url': f'/orders/{order.id}/'
+                'redirect_url': '/orders/'
             })
         else:
             return JsonResponse({

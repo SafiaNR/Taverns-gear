@@ -1,6 +1,4 @@
 from django.db import models
-
-from django.db import models
 from django.conf import settings
 from catalog.models import Product
 
@@ -31,19 +29,16 @@ class Order(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f'Заказ №{self.id} - {self.user.get_full_name() or self.user.username}'
+        return f'Заказ №{self.id}'
     
     def get_total_quantity(self):
-        """количество товаров"""
         return sum(item.quantity for item in self.items.all())
     
     def get_total_cost(self):
-        """стоимость"""
         return sum(item.get_cost() for item in self.items.all())
 
 
 class OrderItem(models.Model):
-    """Позиция в заказе"""
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items', verbose_name='Товар')
     price = models.DecimalField('Цена на момент заказа', max_digits=10, decimal_places=2)

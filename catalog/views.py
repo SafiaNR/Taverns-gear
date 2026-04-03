@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from .models import Product, Category
 
 def catalog(request):
@@ -8,7 +9,8 @@ def catalog(request):
     sort = request.GET.get('sort', '-created_at')
     
     if category_slug:
-        products = products.filter(category__slug=category_slug)
+        category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=category)
     
     allowed_sorts = ['name', '-name', 'price', '-price', 'year', '-year', 'created_at', '-created_at']
     if sort in allowed_sorts:
@@ -17,7 +19,7 @@ def catalog(request):
         products = products.order_by('-created_at')
         sort = '-created_at'
     
-    categories = Category.objects.all()
+    categories = Category.objects.filter(products__stock__gt=0).distinct()
     
     return render(request, 'catalog.html', {
         'products': products,
@@ -28,14 +30,22 @@ def catalog(request):
 
 def product_detail(request, slug):
     """Детальная страница товара"""
-    product = get_object_or_404(Product, slug=slug, stock__gt=0)
-    
-    similar_products = Product.objects.filter(
-        category=product.category, 
-        stock__gt=0
-    ).exclude(id=product.id)[:4]
-    
-    return render(request, 'product_detail.html', {
-        'product': product,
-        'similar_products': similar_products,
-    })
+    try:
+        product = get_object_or_404(Product, slug=slug)
+        
+        if product.stock <= 0:
+            return render(request, 'product_out_of_stock.html', {
+                'product': product
+            })
+        
+        similar_products = Product.objects.filter(
+            category=product.category, 
+            stock__gt=0
+        ).exclude(id=product.id)[:4]
+        
+        return render(request, 'product_detail.html', {
+            'product': product,
+            'similar_products': similar_products,
+        })
+    except Http404:
+        return render(request, 'product_not_found.html', status=404)

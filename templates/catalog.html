@@ -34,11 +34,16 @@
                 <div class="sort-section">
                     <h3>Сортировать по</h3>
                     <div class="sort-links">
-                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-created_at" class="sort-link">Новизне</a>
-                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=name" class="sort-link">Названию</a>
-                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=price" class="sort-link">Цене (возр.)</a>
-                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-price" class="sort-link">Цене (убыв.)</a>
-                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=year" class="sort-link">Году выпуска</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-created_at" 
+                        class="sort-link {% if current_sort == '-created_at' %}active{% endif %}">Новизне</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=name" 
+                        class="sort-link {% if current_sort == 'name' %}active{% endif %}">Названию</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=price" 
+                        class="sort-link {% if current_sort == 'price' %}active{% endif %}">Цене (возр.)</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=-price" 
+                        class="sort-link {% if current_sort == '-price' %}active{% endif %}">Цене (убыв.)</a>
+                        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=year" 
+                        class="sort-link {% if current_sort == 'year' %}active{% endif %}">Году выпуска</a>
                     </div>
                 </div>
             </div>

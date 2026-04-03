@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Где нас найти? - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="contacts-page">
+    <div class="container">
+        <h1>Где нас найти?</h1>
+        
+        <div class="contacts-grid">
+            <!-- Контактные данные -->
+            <div class="contact-info">
+                <h2>Контактные данные</h2>
+                
+                <div class="info-item">
+                    <div>
+                        <h3>Адрес:</h3>
+                        <p>г. Москва, ул. Фэнтезийная, д. 13<br>ТЦ "Подземелье", 3 этаж</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div>
+                        <h3>Телефон:</h3>
+                        <p>+7 (999) 123-45-67</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div>
+                        <h3>Email:</h3>
+                        <p>info@tavernsgear.ru</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div>
+                        <h3>Часы работы:</h3>
+                        <p>Пн-Пт: 10:00 - 20:00</p>
+                        <p>Сб-Вс: 11:00 - 18:00</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Карта -->
+            <div class="map-container">
+                <h2>Мы на карте</h2>
+                <div class="map">
+                    <iframe 
+                        src="https://yandex.ru/map-widget/v1/?ll=37.6176,55.7558&z=12&l=map"
+                        width="100%" 
+                        height="400" 
+                        frameborder="0"
+                        allowfullscreen="true">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

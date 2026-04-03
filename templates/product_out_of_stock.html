@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="product-out-of-stock">
+    <div class="container">
+        <div class="out-of-stock-card">
+            <div class="out-of-stock-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <div class="no-image">📷</div>
+                {% endif %}
+            </div>
+            <div class="out-of-stock-info">
+                <h1>{{ product.name }}</h1>
+                <div class="price">{{ product.price }} ₽</div>
+                <div class="out-of-stock-message">
+                    Товара временно нет в наличии
+                </div>
+                <p>Пожалуйста, зайдите позже или свяжитесь с нами для уточнения даты поступления.</p>
+                <a href="{% url 'catalog' %}" class="btn-back">Вернуться в каталог</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

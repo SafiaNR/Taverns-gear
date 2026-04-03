@@ -9,18 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar">
+     <nav class="navbar">
             <div class="container">
-                <a href="{% url 'catalog' %}" class="logo">Tavern's Gear</a>
+                <a href="{% url 'about' %}" class="logo">Tavern's Gear</a>
                 <ul class="nav-menu">
-                    <li><a href="{% url 'about' %}">О нас</a></li>
-                    <li><a href="{% url 'catalog' %}">Каталог</a></li>
+                    <li><a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">О нас</a></li>
+                    <li><a href="{% url 'contacts' %}" class="{% if request.resolver_match.url_name == 'contacts' %}active{% endif %}">Где нас найти?</a></li>
+                    <li><a href="{% url 'catalog' %}" class="{% if request.resolver_match.url_name == 'catalog' %}active{% endif %}">Каталог</a></li>
                     {% if user.is_authenticated %}
-                        <li><a href="{% url 'cart_detail' %}">Корзина</a></span></li>
-                        <li><a href="{% url 'order_list' %}">Мои заказы</a></li>
+                        <li><a href="{% url 'cart_detail' %}" class="{% if request.resolver_match.url_name == 'cart_detail' %}active{% endif %}">Корзина</a></li>
+                        <li><a href="{% url 'order_list' %}" class="{% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">Мои заказы</a></li>
                         <li><a href="#">{{ user.username }}</a></li>
-                        <li><a href="{% url 'logout' %}">Выйти</a></li>
+                        <li> <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <a href="#" onclick="this.parentNode.submit(); return false;">Выйти</a>
+    </form></li>
                     {% else %}
                         <li><a href="{% url 'login' %}" class="btn-register">Вход</a></li>
                     {% endif %}

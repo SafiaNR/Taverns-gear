@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Товар не найден - Tavern's Gear{% endblock %}
+
+{% block content %}
+<div class="not-found-page">
+    <div class="container">
+        <div class="not-found-card">
+            <div class="not-found-icon">🔍</div>
+            <h1>Товар не найден</h1>
+            <p>К сожалению, такого товара не существует или он был удален.</p>
+            <a href="{% url 'catalog' %}" class="btn-back">Вернуться в каталог</a>
+        </div>
+    </div>
+</div>
+
+<style>
+
+</style>
+{% endblock %}
